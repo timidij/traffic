@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Light Control System</title>
+    <style>
+        /* =====  SAME STYLES AS FIRST FILE  ===== */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,.3);
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 10px; color: #fff; }
+        header p { font-size: 1.1rem; opacity: .9; }
+
+        #main-form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,.1);
+            margin-bottom: 30px;
+        }
+        .individual-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .upload-quadrant {
+            border: 3px dashed #007bff;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .3s ease;
+            border-radius: 15px;
+            background: #f8f9fa;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload-quadrant:hover { border-color: #0056b3; background: #e3f2fd; transform: translateY(-2px); }
+        .upload-quadrant.highlight { border-color: #28a745; background: #d4edda; }
+        .upload-quadrant input[type="file"] { display: none; }
+        .upload-quadrant h3 { margin: 0 0 15px 0; color: #007bff; font-size: 1.3rem; }
+        .quadrant-image-preview {
+            max-width: 90%; max-height: 150px; object-fit: contain;
+            border-radius: 8px; margin-top: 15px; border: 2px solid #dee2e6; display: none;
+        }
+        .quadrant-image-preview:not([src=""]) { display: block; }
+        .error-message-individual { color: #dc3545; font-size: .9em; margin-top: 10px; display: none; }
+        #overall-error-message { color: #dc3545; margin-top: 20px; font-weight: bold; display: none; padding: 15px; background: #f8d7da; border-radius: 8px; }
+
+        .button-container {
+            display: flex; gap: 15px; justify-content: center; margin-top: 30px; flex-wrap: wrap;
+        }
+        .control-button {
+            color: white; padding: 15px 25px; border: none; border-radius: 50px; cursor: pointer;
+            font-size: 1.1em; font-weight: 600; transition: all .3s ease; min-width: 200px;
+        }
+        #predict-btn { background: linear-gradient(135deg,#007bff,#0056b3); }
+        #predict-btn:hover:not(:disabled) { transform: translateY(-2px); }
+        #predict-btn:disabled { background: #6c757d; cursor: not-allowed; }
+        #stop-simulation-btn { background: linear-gradient(135deg,#dc3545,#c82333); }
+        #timer-mode-btn { background: linear-gradient(135deg,#ffc107,#fd7e14); }
+        .control-button:hover { transform: translateY(-2px); }
+
+        .mode-indicator {
+            text-align: center; margin: 15px 0; padding: 10px; border-radius: 8px; font-weight: 600;
+        }
+        .mode-smart { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .mode-timer { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+
+        .results-container {
+            background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,.1);
+            margin: 30px auto; text-align: center; display: none;
+        }
+        .results-container h2 { color: #0056b3; margin-bottom: 20px; }
+        #overall-status-message { font-size: 1.3rem; font-weight: 600; margin-bottom: 30px; padding: 15px; border-radius: 10px; }
+        .status-smart { color: #28a745; background: #d4edda; }
+        .status-timer { color: #fd7e14; background: #fff3cd; }
+
+        /* Intersection Grid & Quadrants (unchanged) */
+        .intersection-grid {
+            display: grid; grid-template-columns: 1fr 1.5fr 1fr; grid-template-rows: 1fr 1.5fr 1fr;
+            gap: 0; background: #555; border-radius: 15px; overflow: hidden; position: relative;
+            max-width: 800px; margin: 40px auto;
+        }
+        .intersection-grid::before {
+            content: ''; grid-column: 2/3; grid-row: 2/3; background: #333; border: 2px dashed #eee;
+            border-radius: 5px; margin: 5px;
+        }
+        .intersection-quadrant {
+            background: #666; color: white; display: flex; flex-direction: column;
+            align-items: center; text-align: center; padding: 10px; position: relative;
+        }
+        #north-approach { grid-area: 1/2/2/3; border-bottom: 2px dashed #eee; justify-content: flex-end; }
+        #south-approach { grid-area: 3/2/4/3; border-top: 2px dashed #eee; justify-content: flex-start; }
+        #east-approach  { grid-area: 2/3/3/4; border-left: 2px dashed #eee; flex-direction: row; justify-content: flex-start; }
+        #west-approach  { grid-area: 2/1/3/2; border-right: 2px dashed #eee; flex-direction: row-reverse; justify-content: flex-end; }
+        .intersection-quadrant h3 { margin: 5px 0; color: white; font-size: 1.1em; }
+        .quadrant-image { max-width: 90%; max-height: 90px; object-fit: contain; border-radius: 3px; margin-top: 5px; border: 1px solid #ddd; display: none; }
+        .quadrant-image:not([src=""]) { display: block; }
+
+        /* Traffic Lights (unchanged) */
+        .traffic-light {
+            position: absolute; width: 25px; height: 70px; background: #222; border-radius: 8px;
+            padding: 4px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; z-index: 10;
+        }
+        .traffic-light .light { width: 20px; height: 20px; border-radius: 50%; background: #555; border: 1px solid #333; }
+        .traffic-light .light.red.active   { background: #dc3545; box-shadow: 0 0 8px #dc3545; }
+        .traffic-light .light.yellow.active{ background: #ffc107; box-shadow: 0 0 8px #ffc107; }
+        .traffic-light .light.green.active { background: #28a745; box-shadow: 0 0 8px #28a745; }
+        .traffic-light.north { top: 75%; left: 42%; transform: translateX(-50%) rotate(180deg); }
+        .traffic-light.south { bottom: 75%; left: 58%; transform: translateX(-50%) rotate(0deg); }
+        .traffic-light.east  { top: 42%; left: 25%; transform: translateY(-50%) rotate(90deg); }
+        .traffic-light.west  { top: 58%; right: 25%; transform: translateY(-50%) rotate(-90deg); }
+
+        /* Responsive tweaks (unchanged) */
+        @media (max-width: 768px) {
+            .individual-upload-grid { grid-template-columns: 1fr; }
+            .upload-quadrant { min-height: 180px; padding: 20px; }
+            #main-form-container { padding: 25px; }
+            .intersection-grid { grid-template-columns: 1fr; grid-template-rows: repeat(4,auto); max-width: 100%; padding: 10px; }
+            .intersection-grid::before { display: none; }
+            .intersection-quadrant { flex-direction: column; margin-bottom: 10px; padding: 15px; border-bottom: 1px dashed #ccc; }
+            #west-approach { border-bottom: none; }
+            .traffic-light { position: static; transform: none; margin: 10px auto; width: 30px; height: 80px; }
+            .button-container { flex-direction: column; align-items: center; }
+            .control-button { width: 100%; max-width: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚦 Traffic Light Control System</h1>
+            <p>Choose between AI-based or Timer-based simulation modes</p>
+        </header>
+
+        <div id="main-form-container">
+            <h2 style="text-align:center;color:#0056b3;margin-bottom:20px;">Traffic Light Control Panel</h2>
+
+            <div class="individual-upload-grid">
+                <div class="upload-quadrant" id="drop-area-north">
+                    <h3>📍 North Approach</h3>
+                    <p>Drag & drop or click to upload</p>
+                    <input type="file" id="file-input-north" accept="image/*" name="image_north">
+                    <img class="quadrant-image-preview" id="preview-north" alt="North preview">
+                    <div class="error-message-individual" id="error-north"></div>
+                </div>
+
+                <div class="upload-quadrant" id="drop-area-south">
+                    <h3>📍 South Approach</h3>
+                    <p>Drag & drop or click to upload</p>
+                    <input type="file" id="file-input-south" accept="image/*" name="image_south">
+                    <img class="quadrant-image-preview" id="preview-south" alt="South preview">
+                    <div class="error-message-individual" id="error-south"></div>
+                </div>
+
+                <div class="upload-quadrant" id="drop-area-east">
+                    <h3>📍 East Approach</h3>
+                    <p>Drag & drop or click to upload</p>
+                    <input type="file" id="file-input-east" accept="image/*" name="image_east">
+                    <img class="quadrant-image-preview" id="preview-east" alt="East preview">
+                    <div class="error-message-individual" id="error-east"></div>
+                </div>
+
+                <div class="upload-quadrant" id="drop-area-west">
+                    <h3>📍 West Approach</h3>
+                    <p>Drag & drop or click to upload</p>
+                    <input type="file" id="file-input-west" accept="image/*" name="image_west">
+                    <img class="quadrant-image-preview" id="preview-west" alt="West preview">
+                    <div class="error-message-individual" id="error-west"></div>
+                </div>
+            </div>
+
+            <div id="overall-error-message"></div>
+
+            <div class="mode-indicator mode-smart" id="mode-indicator">
+                🔄 AI Mode: Upload images for smart traffic detection
+            </div>
+
+            <div class="button-container">
+                <button type="button" id="predict-btn" class="control-button" disabled>🚦 Start AI Simulation</button>
+                <button type="button" id="timer-mode-btn" class="control-button">⏰ Start Timer Mode</button>
+                <button type="button" id="stop-simulation-btn" class="control-button" style="display:none;">⏹️ Stop Simulation</button>
+            </div>
+        </div>
+
+        <!-- Results / Intersection -->
+        <div class="results-container" id="results-container">
+            <h2>🛣️ Intersection Status</h2>
+            <p id="overall-status-message" class="status-smart">Ready to simulate traffic flow...</p>
+
+            <div class="intersection-grid">
+                <div class="intersection-quadrant" id="north-approach">
+                    <h3>North</h3>
+                    <img class="quadrant-image" id="img-north" alt="North view">
+                    <p>Status: <span id="status-north">Waiting...</span></p>
+                    <p>Confidence: <span id="confidence-north">-</span></p>
+                </div>
+                <div class="traffic-light north" id="light-north">
+                    <div class="light red"></div><div class="light yellow"></div><div class="light green"></div>
+                </div>
+
+                <div class="intersection-quadrant" id="west-approach">
+                    <h3>West</h3>
+                    <img class="quadrant-image" id="img-west" alt="West view">
+                    <p>Status: <span id="status-west">Waiting...</span></p>
+                    <p>Confidence: <span id="confidence-west">-</span></p>
+                </div>
+                <div class="traffic-light west" id="light-west">
+                    <div class="light red"></div><div class="light yellow"></div><div class="light green"></div>
+                </div>
+
+                <div class="intersection-quadrant" id="east-approach">
+                    <h3>East</h3>
+                    <img class="quadrant-image" id="img-east" alt="East view">
+                    <p>Status: <span id="status-east">Waiting...</span></p>
+                    <p>Confidence: <span id="confidence-east">-</span></p>
+                </div>
+                <div class="traffic-light east" id="light-east">
+                    <div class="light red"></div><div class="light yellow"></div><div class="light green"></div>
+                </div>
+
+                <div class="intersection-quadrant" id="south-approach">
+                    <h3>South</h3>
+                    <img class="quadrant-image" id="img-south" alt="South view">
+                    <p>Status: <span id="status-south">Waiting...</span></p>
+                    <p>Confidence: <span id="confidence-south">-</span></p>
+                </div>
+                <div class="traffic-light south" id="light-south">
+                    <div class="light red"></div><div class="light yellow"></div><div class="light green"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================
+           GLOBALS  (shared between AI & Timer modes)
+        ========================================================= */
+        const selectedFiles = { north: null, south: null, east: null, west: null };
+        const DIRECTIONS = ['north', 'south', 'east', 'west'];
+
+        const approachElements = {
+            north: { dropArea: document.getElementById('drop-area-north'), fileInput: document.getElementById('file-input-north'), preview: document.getElementById('preview-north'), errorDisplay: document.getElementById('error-north') },
+            south: { dropArea: document.getElementById('drop-area-south'), fileInput: document.getElementById('file-input-south'), preview: document.getElementById('preview-south'), errorDisplay: document.getElementById('error-south') },
+            east:  { dropArea: document.getElementById('drop-area-east'),  fileInput: document.getElementById('file-input-east'),  preview: document.getElementById('preview-east'),  errorDisplay: document.getElementById('error-east')  },
+            west:  { dropArea: document.getElementById('drop-area-west'),  fileInput: document.getElementById('file-input-west'),  preview: document.getElementById('preview-west'),  errorDisplay: document.getElementById('error-west')  }
+        };
+
+        const predictBtn      = document.getElementById('predict-btn');
+        const timerModeBtn    = document.getElementById('timer-mode-btn');
+        const stopBtn         = document.getElementById('stop-simulation-btn');
+        const resultsContainer= document.getElementById('results-container');
+        const overallStatusMsg= document.getElementById('overall-status-message');
+        const modeIndicator   = document.getElementById('mode-indicator');
+        const overallErrorMsg = document.getElementById('overall-error-message');
+
+        /* Simulation state */
+        let currentMode          = 'ai';      // 'ai' | 'timer'
+        let simulationRunning    = false;
+        let phaseTimer           = null;
+        let phaseStartTime       = 0;
+        let currentPhase         = 'ALL_RED';
+        let lastGreenPhase       = null;      // for AI alternation
+        let currentTimerIndex    = 0;         // for fixed timer sequence
+        let currentTrafficDemand = { north:false, south:false, east:false, west:false };
+
+        /* Timing constants */
+        const MIN_GREEN_TIME = 5000;
+        const YELLOW_TIME    = 2000;
+        const ALL_RED_TIME   = 1000;
+        const CYCLE_INTERVAL = 200;
+        const TIMER_SEQUENCE = ['north','south','east','west'];
+
+        /* =========================================================
+           UTILITY / DOM HELPERS
+        ========================================================= */
+        const showOverallError = msg => { overallErrorMsg.textContent = msg; overallErrorMsg.style.display = 'block'; };
+        const hideOverallError = () => overallErrorMsg.style.display = 'none';
+        const showIndividualError = (dir,msg) => { approachElements[dir].errorDisplay.textContent=msg; approachElements[dir].errorDisplay.style.display='block'; };
+        const hideIndividualError = dir => approachElements[dir].errorDisplay.style.display='none';
+
+        function setLightColors(north, south, east, west, msg){
+            const states = {north, south, east, west};
+            DIRECTIONS.forEach(dir=>{
+                const lights = document.getElementById(`light-${dir}`).querySelectorAll('.light');
+                lights.forEach(l=>l.classList.remove('active'));
+                if(states[dir]) document.getElementById(`light-${dir}`).querySelector(`.${states[dir]}`).classList.add('active');
+            });
+            overallStatusMsg.textContent = msg || '';
+        }
+
+        /* =========================================================
+           TRAFFIC SIMULATION ENGINE
+        ========================================================= */
+        function determineNextPhase(){
+            if(!simulationRunning) return;
+
+            const elapsed = Date.now() - phaseStartTime;
+
+            if(currentMode === 'ai'){
+                const lanesWithTraffic = DIRECTIONS.filter(d=>currentTrafficDemand[d]);
+                let nextPhase = currentPhase;
+                let msg = '';
+
+                // Transitions
+                if(currentPhase.endsWith('_GREEN') && elapsed >= MIN_GREEN_TIME){
+                    const dir = currentPhase.split('_')[0];
+                    nextPhase = `${dir}_YELLOW`;
+                    msg = `🟡 ${dir.toUpperCase()} YELLOW`;
+                }else if(currentPhase.endsWith('_YELLOW') && elapsed >= YELLOW_TIME){
+                    nextPhase = 'ALL_RED';
+                    msg = '🔴 ALL RED';
+                }else if(currentPhase === 'ALL_RED' && elapsed >= ALL_RED_TIME){
+                    if(lanesWithTraffic.length){
+                        // simple round-robin
+                        if(!lastGreenPhase || !lanesWithTraffic.includes(lastGreenPhase)){
+                            lastGreenPhase = lanesWithTraffic[0];
+                        }else{
+                            const idx = lanesWithTraffic.indexOf(lastGreenPhase);
+                            lastGreenPhase = lanesWithTraffic[(idx+1)%lanesWithTraffic.length];
+                        }
+                        nextPhase = `${lastGreenPhase}_GREEN`;
+                        msg = `🟢 ${lastGreenPhase.toUpperCase()} GREEN`;
+                    }else{
+                        nextPhase = 'ALL_RED';
+                        msg = '🔴 ALL RED (no traffic)';
+                    }
+                }
+
+                if(nextPhase !== currentPhase){
+                    currentPhase = nextPhase;
+                    phaseStartTime = Date.now();
+                }
+
+                // Apply
+                switch(currentPhase){
+                    case 'north_GREEN': setLightColors('red','green','red','red',msg); break;
+                    case 'north_YELLOW':setLightColors('red','yellow','red','red',msg); break;
+                    case 'south_GREEN': setLightColors('green','red','red','red',msg); break;
+                    case 'south_YELLOW':setLightColors('yellow','red','red','red',msg); break;
+                    case 'east_GREEN':  setLightColors('red','red','red','green',msg); break;
+                    case 'east_YELLOW': setLightColors('red','red','yellow','red',msg); break;
+                    case 'west_GREEN':  setLightColors('red','red','green','red',msg); break;
+                    case 'west_YELLOW': setLightColors('red','red','red','yellow',msg); break;
+                    default:            setLightColors('red','red','red','red',msg);
+                }
+
+            }else{   // TIMER MODE
+                let nextPhase = currentPhase;
+                let msg = '';
+
+                if(currentPhase.endsWith('_GREEN') && elapsed >= MIN_GREEN_TIME){
+                    const dir = currentPhase.split('_')[0];
+                    nextPhase = `${dir}_YELLOW`;
+                    msg = `⏰ ${dir.toUpperCase()} YELLOW`;
+                }else if(currentPhase.endsWith('_YELLOW') && elapsed >= YELLOW_TIME){
+                    nextPhase = 'ALL_RED';
+                    msg = '⏰ ALL RED';
+                }else if(currentPhase === 'ALL_RED' && elapsed >= ALL_RED_TIME){
+                    currentTimerIndex = (currentTimerIndex + 1) % TIMER_SEQUENCE.length;
+                    const nextDir = TIMER_SEQUENCE[currentTimerIndex];
+                    nextPhase = `${nextDir}_GREEN`;
+                    msg = `⏰ ${nextDir.toUpperCase()} GREEN`;
+                }
+
+                if(nextPhase !== currentPhase){
+                    currentPhase = nextPhase;
+                    phaseStartTime = Date.now();
+                }
+
+                switch(currentPhase){
+                    case 'north_GREEN': setLightColors('red','green','red','red',msg); break;
+                    case 'north_YELLOW':setLightColors('red','yellow','red','red',msg); break;
+                    case 'south_GREEN': setLightColors('green','red','red','red',msg); break;
+                    case 'south_YELLOW':setLightColors('yellow','red','red','red',msg); break;
+                    case 'east_GREEN':  setLightColors('red','red','red','green',msg); break;
+                    case 'east_YELLOW': setLightColors('red','red','yellow','red',msg); break;
+                    case 'west_GREEN':  setLightColors('red','red','green','red',msg); break;
+                    case 'west_YELLOW': setLightColors('red','red','red','yellow',msg); break;
+                    default:            setLightColors('red','red','red','red',msg);
+                }
+            }
+        }
+
+        function startSimulation(mode){
+            if(phaseTimer) clearInterval(phaseTimer);
+
+            currentMode       = mode;
+            simulationRunning = true;
+            currentPhase      = 'ALL_RED';
+            phaseStartTime    = Date.now();
+            lastGreenPhase    = null;
+            currentTimerIndex = 0;
+
+            // UI tweaks
+            stopBtn.style.display = 'inline-block';
+            if(mode==='ai'){
+                predictBtn.style.display = 'none';
+                timerModeBtn.style.display = 'inline-block';
+                modeIndicator.className = 'mode-indicator mode-smart';
+                modeIndicator.textContent = '🔄 AI Mode Active – Smart traffic detection';
+                overallStatusMsg.className = 'status-smart';
+            }else{
+                predictBtn.style.display = 'inline-block';
+                timerModeBtn.style.display = 'none';
+                modeIndicator.className = 'mode-indicator mode-timer';
+                modeIndicator.textContent = '⏰ Timer Mode Active – Fixed sequence';
+                overallStatusMsg.className = 'status-timer';
+            }
+
+            resultsContainer.style.display = 'block';
+            setLightColors('red','red','red','red','🚦 Starting simulation...');
+            phaseTimer = setInterval(determineNextPhase, CYCLE_INTERVAL);
+        }
+
+        function stopSimulation(){
+            simulationRunning = false;
+            if(phaseTimer){ clearInterval(phaseTimer); phaseTimer=null; }
+            setLightColors('red','red','red','red','⏹️ Simulation Stopped');
+            overallStatusMsg.textContent = '⏹️ Simulation Stopped';
+            stopBtn.style.display='none';
+            predictBtn.style.display='inline-block';
+            timerModeBtn.style.display='inline-block';
+            modeIndicator.className='mode-indicator mode-smart';
+            modeIndicator.textContent='🔄 AI Mode: Upload images for smart traffic detection';
+            overallStatusMsg.className='status-smart';
+        }
+
+        /* =========================================================
+           FILE UPLOAD HANDLERS
+        ========================================================= */
+        function handleFile(file, dir){
+            hideIndividualError(dir);
+            const valid = ['image/jpeg','image/png','image/gif','image/webp'];
+            if(!valid.includes(file.type)){
+                showIndividualError(dir,'Invalid image type.');
+                selectedFiles[dir]=null; approachElements[dir].preview.src=''; approachElements[dir].preview.style.display='none';
+                checkAllFilesSelected(); return;
+            }
+            if(file.size > 5*1024*1024){
+                showIndividualError(dir,'Image > 5MB.');
+                selectedFiles[dir]=null; approachElements[dir].preview.src=''; approachElements[dir].preview.style.display='none';
+                checkAllFilesSelected(); return;
+            }
+            selectedFiles[dir]=file;
+            const r=new FileReader();
+            r.onload=e=>{ approachElements[dir].preview.src=e.target.result; approachElements[dir].preview.style.display='block'; };
+            r.readAsDataURL(file);
+            checkAllFilesSelected();
+        }
+        DIRECTIONS.forEach(dir=>{
+            const el=approachElements[dir];
+            el.dropArea.addEventListener('click',()=>el.fileInput.click());
+            el.fileInput.addEventListener('change',function(){ if(this.files[0]) handleFile(this.files[0],dir); else{ selectedFiles[dir]=null; el.preview.src=''; el.preview.style.display='none'; hideIndividualError(dir); checkAllFilesSelected(); }});
+            ['dragenter','dragover','dragleave','drop'].forEach(evt=>el.dropArea.addEventListener(evt,e=>{e.preventDefault();e.stopPropagation();}));
+            el.dropArea.addEventListener('dragenter',()=>el.dropArea.classList.add('highlight'));
+            el.dropArea.addEventListener('dragover',()=>el.dropArea.classList.add('highlight'));
+            el.dropArea.addEventListener('dragleave',()=>el.dropArea.classList.remove('highlight'));
+            el.dropArea.addEventListener('drop',e=>{
+                el.dropArea.classList.remove('highlight');
+                if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0],dir);
+            });
+        });
+        function checkAllFilesSelected(){
+            const ok=DIRECTIONS.every(d=>selectedFiles[d]);
+            predictBtn.disabled=!ok;
+            if(ok) hideOverallError(); else showOverallError('Upload all four images.');
+        }
+
+        /* =========================================================
+           BUTTON LISTENERS
+        ========================================================= */
+        predictBtn.addEventListener('click', async ()=>{
+            if(predictBtn.disabled) return;
+            predictBtn.disabled=true;
+            predictBtn.textContent='🔄 Analyzing Traffic...';
+            hideOverallError();
+
+            try{
+                const fd=new FormData();
+                DIRECTIONS.forEach(d=>fd.append('images', selectedFiles[d], `${d}_${selectedFiles[d].name}`));
+                fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                const res = await fetch('{% url "predict" %}', {method:'POST', body:fd});
+                if(!res.ok){ const e=await res.json(); throw new Error(e.error||'Server error'); }
+
+                const data = await res.json();
+                currentTrafficDemand = data.traffic_demand;
+
+                // Populate individual results
+                DIRECTIONS.forEach(dir=>{
+                    const p=data.individual_predictions[dir];
+                    document.getElementById(`img-${dir}`).src=p.image;
+                    document.getElementById(`img-${dir}`).style.display='block';
+                    document.getElementById(`status-${dir}`).textContent=p.class;
+                    document.getElementById(`confidence-${dir}`).textContent=`${(p.confidence*100).toFixed(2)}%`;
+                });
+
+                startSimulation('ai');
+
+            }catch(err){
+                showOverallError(err.message);
+                stopSimulation();
+            }finally{
+                predictBtn.disabled=false;
+                predictBtn.textContent='🚦 Start AI Simulation';
+            }
+        });
+
+        timerModeBtn.addEventListener('click', ()=>startSimulation('timer'));
+        stopBtn.addEventListener('click', stopSimulation);
+
+        /* =========================================================
+           INIT
+        ========================================================= */
+        stopSimulation(); // sets defaults
+        checkAllFilesSelected();
+    </script>
+</body>
+</html>

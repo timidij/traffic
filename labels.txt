@@ -1,0 +1,2 @@
+0 traffic
+1 no traffic

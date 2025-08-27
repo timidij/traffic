@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Light System - Authentication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h1 {
+            color: #0056b3;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .auth-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .auth-button {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5极客x 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .auth-switch p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .auth-switch a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 30px 20px;
+            }
+            
+            .auth-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container" id="login-container">
+        <div class="auth-header">
+            <h1>🔐 Welcome Back</h1>
+            <p>Sign in to access the Traffic Light System</p>
+        </div>
+        <form class="auth-form" id="login-form">
+            <div class="form-group">
+                <label for="login-email">Email Address</label>
+                <input type="email" id="login-email" placeholder="Enter your email" required>
+                <div class="error-message" id="login-email-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password" required>
+                <div class="error-message极客" id="login-password-error"></div>
+            </div>
+            <button type="submit" class="auth-button">Sign In</button>
+        </form>
+        <div class="auth-switch">
+            <p>Don't have an account?</p>
+            <a href="#" id="show-signup">Create an account</a>
+        </div>
+    </div>
+
+    <div class="auth-container" id="signup-container" style="display: none;">
+        <div class="auth-header">
+            <h1>🚦 Create Account</h1>
+            <p>Join our Traffic Light Control System</p>
+        </div>
+        <form class="auth-form"极客 id="signup-form">
+            <div class="form-group">
+                <label for="signup-name">Full Name</label>
+                <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                <div class="error-message" id="signup-name-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email Address</label>
+                <input type="email" id="signup-email" placeholder="Enter your email" required>
+                <div class="error-message" id="signup-email-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="Create a password (min. 6 characters)" required minlength="6">
+                <div class="error-message" id="signup-password-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="signup-confirm">Confirm Password</label>
+                <input type="password" id="signup-confirm" placeholder="Confirm your password" required>
+                <div class="error-message" id="signup-confirm-error"></div>
+            </div>
+            <button type="submit极客" class="auth-button">Create Account</button>
+        </form>
+        <div class极客="auth-switch">
+            <p>Already have an account?</p>
+            <a href="#" id="show-login">Sign in here</a>
+        </div>
+    </div>
+
+    <script>
+        // User Authentication System
+        const users = JSON.parse(localStorage.getItem('trafficLightUsers') || '[]');
+        
+        // DOM Elements
+        const loginContainer = document.getElementById('login-container');
+        const signupContainer = document.getElementById('signup-container');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const showSignupBtn = document.getElementById('show-signup');
+        const showLoginBtn = document.getElementById('show-login');
+
+        // Show/Hide Forms
+        function showLogin() {
+            loginContainer.style.display = 'block';
+            signupContainer.style.display = 'none';
+            clearFormErrors();
+        }
+
+        function showSignup() {
+            loginContainer.style.display = 'none';
+            signupContainer.style.display = 'block';
+            clearFormErrors();
+        }
+
+        function clearFormErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // Form Validation
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function validatePassword(password) {
+            return password.length >= 6;
+        }
+
+        // Signup Functionality
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearFormErrors();
+
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm').value;
+
+            let isValid = true;
+
+            if (!name) {
+                showError('signup-name-error', 'Please enter your full name');
+                isValid = false;
+            }
+
+            if (!validateEmail(email)) {
+                showError('signup-email-error', 'Please enter a valid email address');
+                isValid = false;
+            }
+
+            if (!validatePassword(password)) {
+                showError('signup-password-error', 'Password must be at least 6 characters long');
+                isValid = false;
+            }
+
+            if (password !== confirmPassword) {
+                showError('极客signup-confirm-error', 'Passwords do not match');
+                isValid = false;
+            }
+
+            // Check if user already exists
+            const userExists = users.some(user => user.email === email);
+            if (userExists) {
+                showError('signup-email-error', 'An account with this email already exists');
+                isValid = false;
+            }
+
+            if (isValid) {
+                // Create new user
+                const newUser = {
+                    id: Date.now().toString(),
+                    name: name,
+                    email: email,
+                    password: password,
+                    createdAt: new Date().toISOString()
+                };
+
+                users.push(newUser);
+                localStorage.setItem('trafficLightUsers', JSON.stringify(users));
+                
+                // Show success message and switch to login
+                alert('Account created successfully! Please sign in.');
+                showLogin();
+                signupForm.reset();
+            }
+        });
+
+        // Login Functionality
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearFormErrors();
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            let isValid = true;
+
+            if (!validateEmail(email)) {
+                showError('login-email-error', 'Please enter a valid email address');
+                isValid = false;
+            }
+
+            if (!password) {
+                showError('login-password-error', 'Please enter your password');
+                isValid = false;
+            }
+
+            if (isValid) {
+                const user = users.find(user => user.email === email && user.password === password);
+                
+                if (user) {
+                    // Store current session
+                    localStorage.setItem('currentTrafficLightUser', JSON.stringify({
+                        id: user.id,
+                        name: user.name,
+                        email: user.email
+                    }));
+                    
+                    // Redirect to main application
+                    window.location.href = 'traffic-light-system.html';
+                } else {
+                    showError('login-password-error', 'Invalid email or password');
+                }
+            }
+        });
+
+        // Event listeners for form switching
+        showSignupBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showSignup();
+        });
+
+        showLoginBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLogin();
+        });
+
+        // Check if user is already logged in
+        window.addEventListener('load', function() {
+            const currentUser = localStorage.getItem('currentTrafficLightUser');
+            if (currentUser) {
+                window.location.href = 'traffic-light-system.html';
+            }
+        });
+    </script>
+</body>
+</html>

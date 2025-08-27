@@ -1,0 +1,51 @@
+templates/traffic_light.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Traffic Light</title>
+    <style>
+        body {
+            transition: background-color 1s ease;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .result {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            text-transform: capitalize;
+        }
+        .preview {
+            max-width: 100%;
+            margin-top: 1rem;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Smart Traffic Light System</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Analyze Traffic</button>
+        </form>
+
+        {% if image_data %}
+  <img src="{{ image_data }}" alt="Uploaded Image">
+{% endif %}
+
+{% if result %}
+  <p>Classification Result: {{ result }}</p>
+{% endif %}
+
+    </div>
+</body>
+</html>
