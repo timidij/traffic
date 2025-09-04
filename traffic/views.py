@@ -20,8 +20,7 @@ import numpy as np
 import base64
 import uuid
 from datetime import datetime
-
-
+import os
 
 from django.core.files.storage import FileSystemStorage
 from .forms import ImageUploadForm
@@ -125,3 +124,45 @@ def predict(request):
         return JsonResponse(response_data)
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def process_all_traffic_images(request):
+    """
+    Processes all images in the traffic_images folder,
+    runs prediction, and saves results to a JSON file.
+    """
+    # Adjust this path as needed
+    images_dir = os.path.join(settings.BASE_DIR, 'traffic_images')
+    output_json_path = os.path.join(settings.BASE_DIR, 'traffic_images_results.json')
+
+    results = []
+    valid_exts = ('.jpg', '.jpeg', '.png', '.gif', '.webp')
+
+    if not os.path.exists(images_dir):
+        return JsonResponse({'error': 'traffic_images folder not found'}, status=404)
+
+    for fname in os.listdir(images_dir):
+        if fname.lower().endswith(valid_exts):
+            img_path = os.path.join(images_dir, fname)
+            with open(img_path, 'rb') as f:
+                img_bytes = f.read()
+            prediction = get_prediction_result(img_bytes)
+            if prediction is None:
+                result = {
+                    'image_path': img_path,
+                    'status': 'error',
+                    'confidence': 0
+                }
+            else:
+                result = {
+                    'image_path': img_path,
+                    'status': prediction.get('class', 'unknown'),
+                    'confidence': prediction.get('confidence', 0)
+                }
+            results.append(result)
+
+    # Save to JSON file
+    with open(output_json_path, 'w') as f:
+        json.dump(results, f, indent=2)
+
+    return JsonResponse({'message': 'Processed all images', 'results_file': output_json_path, 'count': len(results)})
+

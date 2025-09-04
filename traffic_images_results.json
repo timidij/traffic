@@ -1,0 +1,407 @@
+[
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1408885294-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999984502792358
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1459115632-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 1.0
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1459115678-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999978542327881
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1470300838-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999995231628418
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1470300844-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9956413507461548
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1686720413-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999998807907104
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1788971664-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9998598098754883
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1807829942-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.99982750415802
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1810472213-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 1.0
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1830826913-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.8886672854423523
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-1858534075-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9391608238220215
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2078968872-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9978062510490417
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2150289267-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9464067816734314
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2150323750-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.6725078225135803
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2150323775-612x612.jpg",
+    "status": "No traffic",
+    "confidence": 0.9892219305038452
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2150323789-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.6942110061645508
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2159139908-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 1.0
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2165639346-612x612.jpg",
+    "status": "No traffic",
+    "confidence": 0.971895158290863
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2191750624-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9857418537139893
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2191750625-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.998299777507782
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2197337969-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999964237213135
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2205824101-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9998575448989868
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2213199312-612x612.jpg",
+    "status": "No traffic",
+    "confidence": 0.9636939764022827
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2217804559-612x612.jpg",
+    "status": "No traffic",
+    "confidence": 0.9898691177368164
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2217804560-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9915705919265747
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2217804562-612x612.jpg",
+    "status": "No traffic",
+    "confidence": 0.9382331967353821
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2217804571-612x612.jpg",
+    "status": "No traffic",
+    "confidence": 0.9742252230644226
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-2217804574-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.9997994303703308
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\gettyimages-a0153-000156-612x612.jpg",
+    "status": "Traffic",
+    "confidence": 0.8131315112113953
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\ghvhng.jpg",
+    "status": "No traffic",
+    "confidence": 0.6410937309265137
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\happy-woman-waving-hand-outside-260nw-2153910111.jpg",
+    "status": "Traffic",
+    "confidence": 0.9974092841148376
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\heaven-paradise-kingdom-castle-above-260nw-2200481397.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999933242797852
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\highway-road-mountain-natural-scenery-260nw-2378711719.jpg",
+    "status": "No traffic",
+    "confidence": 0.999995231628418
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\houston-tx-usa-5152024-red-260nw-2469050045.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999969005584717
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images (1).jpg",
+    "status": "Traffic",
+    "confidence": 0.9999935626983643
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images (2).jpg",
+    "status": "No traffic",
+    "confidence": 0.9999361038208008
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images (3).jpg",
+    "status": "No traffic",
+    "confidence": 0.9999972581863403
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images (4).jpg",
+    "status": "No traffic",
+    "confidence": 1.0
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images (5).jpg",
+    "status": "No traffic",
+    "confidence": 0.9999990463256836
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images (6).jpg",
+    "status": "No traffic",
+    "confidence": 0.9999872446060181
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images (7).jpg",
+    "status": "No traffic",
+    "confidence": 0.9999843835830688
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images (8).jpg",
+    "status": "No traffic",
+    "confidence": 0.9999998807907104
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images (9).jpg",
+    "status": "No traffic",
+    "confidence": 0.999996542930603
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\images.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999997615814209
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\isolated-simple-brown-suv-car-260nw-2370061141.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999986886978149
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\kharkiv-ukraine-july-2020-sports-260nw-2318511761.jpg",
+    "status": "No traffic",
+    "confidence": 0.9890596866607666
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\kharkiv-ukraine-july-2021-bmw-260nw-2228751545.jpg",
+    "status": "Traffic",
+    "confidence": 0.9977865219116211
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\long-empty-road-clear-blue-260nw-2493695879.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999909400939941
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\long-road-clear-blue-sky-260nw-2495797789.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999655485153198
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\long-road-clear-blue-sky-260nw-2501615713.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999856948852539
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\long-road-leads-urban-skyline-260nw-2586736991.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999843835830688
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\manhattan-new-york-usa-april-260nw-1718885947.jpg",
+    "status": "No traffic",
+    "confidence": 0.999996542930603
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\manhattan-new-york-usa-march-260nw-1685116399.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999755620956421
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\manhattan-new-york-usa-march-260nw-1685116432.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999927282333374
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\manhattan-new-york-usa-march-260nw-1685116462.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999643564224243
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\manhattan-new-york-usa-march-260nw-1686009973.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999957084655762
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\modern-airport-terminal-open-road-260nw-2481952227.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999988079071045
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\modern-bridge-over-nile-popular-260nw-2367597037.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999891519546509
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\modern-subcompact-crossover-suv-beautiful-260nw-2265832113.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999988079071045
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\moody-monochrome-view-cortlandt-alley-260nw-441915235.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999992847442627
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\motion-speed-racing-track-260nw-627982877.jpg",
+    "status": "No traffic",
+    "confidence": 0.999953031539917
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\mountain-road-colorful-sunset-summer-260nw-2350077481.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999946355819702
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\mountain-road-landscape-rocks-sunny-260nw-648685333.jpg",
+    "status": "No traffic",
+    "confidence": 0.999980092048645
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-asphalt-road-surface-on-260nw-2498647235.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999969005584717
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-york-apr-25-2020-260nw-1730751187.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999978542327881
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-york-city-apr-7-260nw-1700884909.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999934434890747
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-york-city-april-19-260nw-1718581999.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999234676361084
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-york-city-april-19-260nw-1718582011.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999996423721313
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-york-city-april-19-260nw-1718582017.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999948740005493
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-york-city-dec16-stone-260nw-133036895.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999972581863403
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-york-city-manhattan-empty-260nw-420829189.jpg",
+    "status": "No traffic",
+    "confidence": 0.999998927116394
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-york-city-nightscape-glowing-260nw-2440717387.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999438524246216
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\new-york-city-ny-usa-260nw-1688229622.jpg",
+    "status": "No traffic",
+    "confidence": 0.9988099336624146
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\rental-car-spain-mountain-landscape-260nw-2386642963.jpg",
+    "status": "Traffic",
+    "confidence": 0.8033136129379272
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\road-landscape-red-car-beautiful-260nw-2377086843.jpg",
+    "status": "No traffic",
+    "confidence": 0.5895642042160034
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\road-traffic-safety-school-bus-260nw-2360708957.jpg",
+    "status": "Traffic",
+    "confidence": 0.883460283279419
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\seattle-washington-usa-march-31-260nw-2284495465.jpg",
+    "status": "Traffic",
+    "confidence": 0.9857742786407471
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\two-white-trucks-driving-on-260nw-2340361165.jpg",
+    "status": "No traffic",
+    "confidence": 0.9996986389160156
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\white-truck-driving-on-highway-260nw-1899557371.jpg",
+    "status": "No traffic",
+    "confidence": 0.9999611377716064
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\white-truck-driving-on-highway-260nw-2241539879.jpg",
+    "status": "No traffic",
+    "confidence": 0.9295430183410645
+  },
+  {
+    "image_path": "C:\\Users\\MR ODUBO\\Documents\\tried\\light\\traffic_images\\woburnbedsuk-august-19th-2023-2019-260nw-2351334283.jpg",
+    "status": "Traffic",
+    "confidence": 0.9999834299087524
+  }
+]
