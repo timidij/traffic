@@ -148,6 +148,22 @@
             .button-container { flex-direction: column; align-items: center; }
             .control-button { width: 100%; max-width: 250px; }
         }
+
+        /* Countdown timer style */
+        #light-countdown {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #007bff;
+            background: rgba(255,255,255,0.85);
+            border-radius: 15px;
+            padding: 12px 32px;
+            z-index: 100;
+            pointer-events: none;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -252,293 +268,219 @@
                 <div class="traffic-light south" id="light-south">
                     <div class="light red"></div><div class="light yellow"></div><div class="light green"></div>
                 </div>
+<!-- Countdown timer (initially hidden) -->
+<div id="light-countdown" style="
+                    position: absolute;
+                    top: 50%; left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 2.2rem;
+                    font-weight: bold;
+                    color: #007bff;
+                    background: rgba(255,255,255,0.85);
+                    border-radius: 15px;
+                    padding: 12px 32px;
+                    z-index: 100;
+                    pointer-events: none;
+                    display: none;
+                "></div>
             </div>
         </div>
     </div>
 
     <script>
-        /* =========================================================
-           GLOBALS  (shared between AI & Timer modes)
-        ========================================================= */
-        const selectedFiles = { north: null, south: null, east: null, west: null };
+                    // --- CONFIG ---
         const DIRECTIONS = ['north', 'south', 'east', 'west'];
+            const BATCH_INTERVAL = 10; // seconds for green/yellow cycle
+            const YELLOW_INTERVAL = 2; // seconds for yellow
+            const BATCH_REFRESH_INTERVAL = 30; // seconds for new random batch in AI mode
 
-        const approachElements = {
-            north: { dropArea: document.getElementById('drop-area-north'), fileInput: document.getElementById('file-input-north'), preview: document.getElementById('preview-north'), errorDisplay: document.getElementById('error-north') },
-            south: { dropArea: document.getElementById('drop-area-south'), fileInput: document.getElementById('file-input-south'), preview: document.getElementById('preview-south'), errorDisplay: document.getElementById('error-south') },
-            east:  { dropArea: document.getElementById('drop-area-east'),  fileInput: document.getElementById('file-input-east'),  preview: document.getElementById('preview-east'),  errorDisplay: document.getElementById('error-east')  },
-            west:  { dropArea: document.getElementById('drop-area-west'),  fileInput: document.getElementById('file-input-west'),  preview: document.getElementById('preview-west'),  errorDisplay: document.getElementById('error-west')  }
-        };
+            let trafficImageData = [];
+            let countdownTimer = null;
+            let batchRefreshTimer = null;
+            let aiModeActive = false;
+            let timerModeActive = false;
+            let currentPhase = 'ALL_RED';
+            let phaseTimer = null;
+            let phaseStartTime = 0;
+            let currentTrafficDemand = { north: false, south: false, east: false, west: false };
 
-        const predictBtn      = document.getElementById('predict-btn');
-        const timerModeBtn    = document.getElementById('timer-mode-btn');
-        const stopBtn         = document.getElementById('stop-simulation-btn');
-        const resultsContainer= document.getElementById('results-container');
-        const overallStatusMsg= document.getElementById('overall-status-message');
-        const modeIndicator   = document.getElementById('mode-indicator');
-        const overallErrorMsg = document.getElementById('overall-error-message');
+            // DOM elements
+            const predictBtn = document.getElementById('predict-btn');
+            const timerModeBtn = document.getElementById('timer-mode-btn');
+            const stopSimulationBtn = document.getElementById('stop-simulation-btn');
+            const resultsContainer = document.getElementById('results-container');
+            const overallStatusMessage = document.getElementById('overall-status-message');
+            const intersectionGrid = document.querySelector('.intersection-grid');
 
-        /* Simulation state */
-        let currentMode          = 'ai';      // 'ai' | 'timer'
-        let simulationRunning    = false;
-        let phaseTimer           = null;
-        let phaseStartTime       = 0;
-        let currentPhase         = 'ALL_RED';
-        let lastGreenPhase       = null;      // for AI alternation
-        let currentTimerIndex    = 0;         // for fixed timer sequence
-        let currentTrafficDemand = { north:false, south:false, east:false, west:false };
-
-        /* Timing constants */
-        const MIN_GREEN_TIME = 5000;
-        const YELLOW_TIME    = 2000;
-        const ALL_RED_TIME   = 1000;
-        const CYCLE_INTERVAL = 200;
-        const TIMER_SEQUENCE = ['north','south','east','west'];
-
-        /* =========================================================
-           UTILITY / DOM HELPERS
-        ========================================================= */
-        const showOverallError = msg => { overallErrorMsg.textContent = msg; overallErrorMsg.style.display = 'block'; };
-        const hideOverallError = () => overallErrorMsg.style.display = 'none';
-        const showIndividualError = (dir,msg) => { approachElements[dir].errorDisplay.textContent=msg; approachElements[dir].errorDisplay.style.display='block'; };
-        const hideIndividualError = dir => approachElements[dir].errorDisplay.style.display='none';
-
-        function setLightColors(north, south, east, west, msg){
-            const states = {north, south, east, west};
-            DIRECTIONS.forEach(dir=>{
-                const lights = document.getElementById(`light-${dir}`).querySelectorAll('.light');
-                lights.forEach(l=>l.classList.remove('active'));
-                if(states[dir]) document.getElementById(`light-${dir}`).querySelector(`.${states[dir]}`).classList.add('active');
+            // --- Utility Functions ---
+            function setLightColors(north, south, east, west, message) {
+                DIRECTIONS.forEach(dir => {
+                    const lightElement = document.getElementById(`light-${dir}`);
+                    lightElement.querySelectorAll('.light').forEach(light => light.classList.remove('active'));
             });
-            overallStatusMsg.textContent = msg || '';
+            const lightStates = { north, south, east, west };
+            for (const dir in lightStates) {
+                const color = lightStates[dir];
+                if (color) {
+                    document.getElementById(`light-${dir}`).querySelector(`.${color}`).classList.add('active');
+                }
+            }
+            if (message) overallStatusMessage.textContent = message;
         }
 
-        /* =========================================================
-           TRAFFIC SIMULATION ENGINE
-        ========================================================= */
-        function determineNextPhase(){
-            if(!simulationRunning) return;
+    // --- AI MODE: Fetch and display random batch ---
+    async function fetchTrafficImagesJSON() {
+        const resp = await fetch('/static/traffic_images_results.json');
+        trafficImageData = await resp.json();
+    }
 
-            const elapsed = Date.now() - phaseStartTime;
+                    function getRandomBatch() {
+                        if (trafficImageData.length < 4) return [];
+                        const shuffled = trafficImageData.slice().sort(() => Math.random() - 0.5);
+                        return shuffled.slice(0, 4);
+                }
 
-            if(currentMode === 'ai'){
-                const lanesWithTraffic = DIRECTIONS.filter(d=>currentTrafficDemand[d]);
+                    function displayBatch(batch) {
+                        DIRECTIONS.forEach((dir, i) => {
+                            const info = batch[i];
+                            if (!info) return;
+                            document.getElementById(`img-${dir}`).src = info.image_path.replace(/\\/g, '/');
+                            document.getElementById(`img-${dir}`).style.display = 'block';
+                            document.getElementById(`status-${dir}`).textContent = info.status;
+                            document.getElementById(`confidence-${dir}`).textContent = `${(info.confidence * 100).toFixed(2)}%`;
+                        });
+                        // Update currentTrafficDemand for the state machine
+                        currentTrafficDemand = {};
+                        DIRECTIONS.forEach((dir, i) => {
+                            const status = batch[i]?.status?.toLowerCase();
+                            currentTrafficDemand[dir] = (status === "traffic" || status === "vehicle");
+                        });
+                }
+
+                    // --- TRAFFIC LIGHT STATE MACHINE (works for both AI and Timer mode) ---
+                    function determineNextPhase() {
+                        const timeElapsed = Date.now() - phaseStartTime;
                 let nextPhase = currentPhase;
-                let msg = '';
+                    let statusMessage = "Evaluating...";
 
-                // Transitions
-                if(currentPhase.endsWith('_GREEN') && elapsed >= MIN_GREEN_TIME){
-                    const dir = currentPhase.split('_')[0];
-                    nextPhase = `${dir}_YELLOW`;
-                    msg = `🟡 ${dir.toUpperCase()} YELLOW`;
-                }else if(currentPhase.endsWith('_YELLOW') && elapsed >= YELLOW_TIME){
-                    nextPhase = 'ALL_RED';
-                    msg = '🔴 ALL RED';
-                }else if(currentPhase === 'ALL_RED' && elapsed >= ALL_RED_TIME){
-                    if(lanesWithTraffic.length){
-                        // simple round-robin
-                        if(!lastGreenPhase || !lanesWithTraffic.includes(lastGreenPhase)){
-                            lastGreenPhase = lanesWithTraffic[0];
-                        }else{
-                            const idx = lanesWithTraffic.indexOf(lastGreenPhase);
-                            lastGreenPhase = lanesWithTraffic[(idx+1)%lanesWithTraffic.length];
+                    // Build lanesWithTraffic based on currentTrafficDemand
+                    const lanesWithTraffic = [];
+                    if (currentTrafficDemand.north) lanesWithTraffic.push('N_GREEN');
+                    if (currentTrafficDemand.south) lanesWithTraffic.push('S_GREEN');
+                    if (currentTrafficDemand.east) lanesWithTraffic.push('E_GREEN');
+                    if (currentTrafficDemand.west) lanesWithTraffic.push('W_GREEN');
+
+                    if (lanesWithTraffic.length > 0) {
+                        if (currentPhase === 'ALL_RED' || timeElapsed >= BATCH_INTERVAL * 1000) {
+                            // Rotate to next lane with traffic
+                            const currentIndex = lanesWithTraffic.indexOf(currentPhase);
+                            const nextIndex = (currentIndex + 1) % lanesWithTraffic.length;
+                            nextPhase = lanesWithTraffic[nextIndex];
+                            statusMessage = `${nextPhase.replace('_GREEN', ' Green')}`;
                         }
-                        nextPhase = `${lastGreenPhase}_GREEN`;
-                        msg = `🟢 ${lastGreenPhase.toUpperCase()} GREEN`;
-                    }else{
-                        nextPhase = 'ALL_RED';
-                        msg = '🔴 ALL RED (no traffic)';
-                    }
-                }
-
-                if(nextPhase !== currentPhase){
-                    currentPhase = nextPhase;
-                    phaseStartTime = Date.now();
-                }
-
-                // Apply
-                switch(currentPhase){
-                    case 'north_GREEN': setLightColors('red','green','red','red',msg); break;
-                    case 'north_YELLOW':setLightColors('red','yellow','red','red',msg); break;
-                    case 'south_GREEN': setLightColors('green','red','red','red',msg); break;
-                    case 'south_YELLOW':setLightColors('yellow','red','red','red',msg); break;
-                    case 'east_GREEN':  setLightColors('red','red','red','green',msg); break;
-                    case 'east_YELLOW': setLightColors('red','red','yellow','red',msg); break;
-                    case 'west_GREEN':  setLightColors('red','red','green','red',msg); break;
-                    case 'west_YELLOW': setLightColors('red','red','red','yellow',msg); break;
-                    default:            setLightColors('red','red','red','red',msg);
-                }
-
-            }else{   // TIMER MODE
-                let nextPhase = currentPhase;
-                let msg = '';
-
-                if(currentPhase.endsWith('_GREEN') && elapsed >= MIN_GREEN_TIME){
-                    const dir = currentPhase.split('_')[0];
-                    nextPhase = `${dir}_YELLOW`;
-                    msg = `⏰ ${dir.toUpperCase()} YELLOW`;
-                }else if(currentPhase.endsWith('_YELLOW') && elapsed >= YELLOW_TIME){
+                    } else {
                     nextPhase = 'ALL_RED';
-                    msg = '⏰ ALL RED';
-                }else if(currentPhase === 'ALL_RED' && elapsed >= ALL_RED_TIME){
-                    currentTimerIndex = (currentTimerIndex + 1) % TIMER_SEQUENCE.length;
-                    const nextDir = TIMER_SEQUENCE[currentTimerIndex];
-                    nextPhase = `${nextDir}_GREEN`;
-                    msg = `⏰ ${nextDir.toUpperCase()} GREEN`;
+                    statusMessage = 'All Red (No traffic detected anywhere).';
                 }
 
-                if(nextPhase !== currentPhase){
+                    if (nextPhase !== currentPhase) {
                     currentPhase = nextPhase;
                     phaseStartTime = Date.now();
                 }
 
-                switch(currentPhase){
-                    case 'north_GREEN': setLightColors('red','green','red','red',msg); break;
-                    case 'north_YELLOW':setLightColors('red','yellow','red','red',msg); break;
-                    case 'south_GREEN': setLightColors('green','red','red','red',msg); break;
-                    case 'south_YELLOW':setLightColors('yellow','red','red','red',msg); break;
-                    case 'east_GREEN':  setLightColors('red','red','red','green',msg); break;
-                    case 'east_YELLOW': setLightColors('red','red','yellow','red',msg); break;
-                    case 'west_GREEN':  setLightColors('red','red','green','red',msg); break;
-                    case 'west_YELLOW': setLightColors('red','red','red','yellow',msg); break;
-                    default:            setLightColors('red','red','red','red',msg);
-                }
-            }
-        }
-
-        function startSimulation(mode){
-            if(phaseTimer) clearInterval(phaseTimer);
-
-            currentMode       = mode;
-            simulationRunning = true;
-            currentPhase      = 'ALL_RED';
-            phaseStartTime    = Date.now();
-            lastGreenPhase    = null;
-            currentTimerIndex = 0;
-
-            // UI tweaks
-            stopBtn.style.display = 'inline-block';
-            if(mode==='ai'){
-                predictBtn.style.display = 'none';
-                timerModeBtn.style.display = 'inline-block';
-                modeIndicator.className = 'mode-indicator mode-smart';
-                modeIndicator.textContent = '🔄 AI Mode Active – Smart traffic detection';
-                overallStatusMsg.className = 'status-smart';
-            }else{
-                predictBtn.style.display = 'inline-block';
-                timerModeBtn.style.display = 'none';
-                modeIndicator.className = 'mode-indicator mode-timer';
-                modeIndicator.textContent = '⏰ Timer Mode Active – Fixed sequence';
-                overallStatusMsg.className = 'status-timer';
+                    // Set lights for the current phase
+                    if (currentPhase === 'N_GREEN') {
+                        setLightColors('red', 'green', 'red', 'red', 'North Green');
+                    } else if (currentPhase === 'S_GREEN') {
+                        setLightColors('green', 'red', 'red', 'red', 'South Green');
+                    } else if (currentPhase === 'E_GREEN') {
+                        setLightColors('red', 'red', 'red', 'green', 'East Green');
+                    } else if (currentPhase === 'W_GREEN') {
+                        setLightColors('red', 'red', 'green', 'red', 'West Green');
+                    } else {
+                        setLightColors('red', 'red', 'red', 'red', 'All Red');
+                    }
             }
 
+                    function startTrafficSimulation() {
+                        if (phaseTimer) clearInterval(phaseTimer);
+                        currentPhase = 'ALL_RED';
+                        phaseStartTime = Date.now();
+                        setLightColors('red', 'red', 'red', 'red', 'Starting simulation...');
             resultsContainer.style.display = 'block';
-            setLightColors('red','red','red','red','🚦 Starting simulation...');
-            phaseTimer = setInterval(determineNextPhase, CYCLE_INTERVAL);
+                    stopSimulationBtn.style.display = 'inline-block';
+                    predictBtn.style.display = 'none';
+                    phaseTimer = setInterval(determineNextPhase, 1000);
         }
 
-        function stopSimulation(){
-            simulationRunning = false;
-            if(phaseTimer){ clearInterval(phaseTimer); phaseTimer=null; }
-            setLightColors('red','red','red','red','⏹️ Simulation Stopped');
-            overallStatusMsg.textContent = '⏹️ Simulation Stopped';
-            stopBtn.style.display='none';
-            predictBtn.style.display='inline-block';
-            timerModeBtn.style.display='inline-block';
-            modeIndicator.className='mode-indicator mode-smart';
-            modeIndicator.textContent='🔄 AI Mode: Upload images for smart traffic detection';
-            overallStatusMsg.className='status-smart';
+                    function stopTrafficSimulation() {
+                        if (phaseTimer) clearInterval(phaseTimer);
+                        phaseTimer = null;
+                        overallStatusMessage.textContent = 'Simulation Stopped.';
+                        setLightColors('red', 'red', 'red', 'red', 'Simulation Stopped.');
+                        stopSimulationBtn.style.display = 'none';
+                        predictBtn.style.display = 'inline-block';
         }
 
-        /* =========================================================
-           FILE UPLOAD HANDLERS
-        ========================================================= */
-        function handleFile(file, dir){
-            hideIndividualError(dir);
-            const valid = ['image/jpeg','image/png','image/gif','image/webp'];
-            if(!valid.includes(file.type)){
-                showIndividualError(dir,'Invalid image type.');
-                selectedFiles[dir]=null; approachElements[dir].preview.src=''; approachElements[dir].preview.style.display='none';
-                checkAllFilesSelected(); return;
-            }
-            if(file.size > 5*1024*1024){
-                showIndividualError(dir,'Image > 5MB.');
-                selectedFiles[dir]=null; approachElements[dir].preview.src=''; approachElements[dir].preview.style.display='none';
-                checkAllFilesSelected(); return;
-            }
-            selectedFiles[dir]=file;
-            const r=new FileReader();
-            r.onload=e=>{ approachElements[dir].preview.src=e.target.result; approachElements[dir].preview.style.display='block'; };
-            r.readAsDataURL(file);
-            checkAllFilesSelected();
-        }
-        DIRECTIONS.forEach(dir=>{
-            const el=approachElements[dir];
-            el.dropArea.addEventListener('click',()=>el.fileInput.click());
-            el.fileInput.addEventListener('change',function(){ if(this.files[0]) handleFile(this.files[0],dir); else{ selectedFiles[dir]=null; el.preview.src=''; el.preview.style.display='none'; hideIndividualError(dir); checkAllFilesSelected(); }});
-            ['dragenter','dragover','dragleave','drop'].forEach(evt=>el.dropArea.addEventListener(evt,e=>{e.preventDefault();e.stopPropagation();}));
-            el.dropArea.addEventListener('dragenter',()=>el.dropArea.classList.add('highlight'));
-            el.dropArea.addEventListener('dragover',()=>el.dropArea.classList.add('highlight'));
-            el.dropArea.addEventListener('dragleave',()=>el.dropArea.classList.remove('highlight'));
-            el.dropArea.addEventListener('drop',e=>{
-                el.dropArea.classList.remove('highlight');
-                if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0],dir);
-            });
-        });
-        function checkAllFilesSelected(){
-            const ok=DIRECTIONS.every(d=>selectedFiles[d]);
-            predictBtn.disabled=!ok;
-            if(ok) hideOverallError(); else showOverallError('Upload all four images.');
+                    // --- AI MODE: Batch refresh logic ---
+                    function startAIBatchRefresh() {
+                        let aiBatchCountdown = BATCH_REFRESH_INTERVAL;
+                        clearInterval(batchRefreshTimer);
+                        batchRefreshTimer = setInterval(() => {
+                            aiBatchCountdown--;
+                            if (aiBatchCountdown <= 0) {
+                                const batch = getRandomBatch();
+                                if (batch.length === 4) {
+                                    displayBatch(batch);
+                                    startTrafficSimulation();
+                                }
+                            aiBatchCountdown = BATCH_REFRESH_INTERVAL;
+                        }
+                    }, 1000);
         }
 
-        /* =========================================================
-           BUTTON LISTENERS
-        ========================================================= */
-        predictBtn.addEventListener('click', async ()=>{
-            if(predictBtn.disabled) return;
-            predictBtn.disabled=true;
-            predictBtn.textContent='🔄 Analyzing Traffic...';
-            hideOverallError();
+                    // --- BUTTONS ---
+                    predictBtn.onclick = async () => {
+                        aiModeActive = true;
+                        timerModeActive = false;
+                        predictBtn.disabled = true;
+                        timerModeBtn.disabled = true;
+                        stopSimulationBtn.style.display = 'inline-block';
+                        resultsContainer.style.display = 'block';
+                        await fetchTrafficImagesJSON();
+                        const batch = getRandomBatch();
+                        if (batch.length === 4) {
+                            displayBatch(batch);
+                            startTrafficSimulation();
+                            startAIBatchRefresh();
+                        }
+                    };
 
-            try{
-                const fd=new FormData();
-                DIRECTIONS.forEach(d=>fd.append('images', selectedFiles[d], `${d}_${selectedFiles[d].name}`));
-                fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                    timerModeBtn.onclick = () => {
+                        aiModeActive = false;
+                        timerModeActive = true;
+                        predictBtn.disabled = true;
+                        timerModeBtn.disabled = true;
+                        stopSimulationBtn.style.display = 'inline-block';
+                        resultsContainer.style.display = 'block';
+                        // Set all roads to traffic
+                        currentTrafficDemand = { north: true, south: true, east: true, west: true };
+                        startTrafficSimulation();
+                    };
 
-                const res = await fetch('{% url "predict" %}', {method:'POST', body:fd});
-                if(!res.ok){ const e=await res.json(); throw new Error(e.error||'Server error'); }
+                    stopSimulationBtn.onclick = () => {
+                        stopTrafficSimulation();
+                        clearInterval(batchRefreshTimer);
+                        predictBtn.disabled = false;
+                        timerModeBtn.disabled = false;
+                    };
 
-                const data = await res.json();
-                currentTrafficDemand = data.traffic_demand;
-
-                // Populate individual results
-                DIRECTIONS.forEach(dir=>{
-                    const p=data.individual_predictions[dir];
-                    document.getElementById(`img-${dir}`).src=p.image;
-                    document.getElementById(`img-${dir}`).style.display='block';
-                    document.getElementById(`status-${dir}`).textContent=p.class;
-                    document.getElementById(`confidence-${dir}`).textContent=`${(p.confidence*100).toFixed(2)}%`;
-                });
-
-                startSimulation('ai');
-
-            }catch(err){
-                showOverallError(err.message);
-                stopSimulation();
-            }finally{
-                predictBtn.disabled=false;
-                predictBtn.textContent='🚦 Start AI Simulation';
-            }
-        });
-
-        timerModeBtn.addEventListener('click', ()=>startSimulation('timer'));
-        stopBtn.addEventListener('click', stopSimulation);
-
-        /* =========================================================
-           INIT
-        ========================================================= */
-        stopSimulation(); // sets defaults
-        checkAllFilesSelected();
+                    // --- INITIALIZATION ---
+                    window.addEventListener('DOMContentLoaded', () => {
+                        stopTrafficSimulation();
+                        predictBtn.disabled = false;
+                        timerModeBtn.disabled = false;
+                    });
     </script>
 </body>
 </html>
